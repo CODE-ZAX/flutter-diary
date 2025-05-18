@@ -1,4 +1,6 @@
+import 'package:everyday_chronicles/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -7,21 +9,18 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  void _submitForm() {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  final loader = false.obs;
+  void _submitForm(AuthController controller) async {
     if (_formKey.currentState!.validate()) {
-      // Perform sign-up logic here
+      loader.value = true;
+      await controller.signUp(_emailController.text, _passwordController.text);
+      loader.value = false;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign-up successful!')),
       );
@@ -30,6 +29,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final _controller = Get.find<AuthController>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign Up'),
@@ -38,8 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
             children: [
               TextFormField(
                 controller: _emailController,
@@ -49,7 +49,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
                   }
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                  final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                  if (!emailRegex.hasMatch(value)) {
                     return 'Please enter a valid email';
                   }
                   return null;
@@ -86,9 +87,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
               ),
               SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: Text('Sign Up'),
+              Obx(
+                () => loader.value
+                    ? Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        onPressed: () => _submitForm(_controller),
+                        child: Text('Sign Up'),
+                      ),
               ),
             ],
           ),
