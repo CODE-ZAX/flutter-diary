@@ -43,7 +43,7 @@ class AuthController extends GetxController {
     }
   }
 
-  void signUp(String email, String password) async {
+  Future<void> signUp(String email, String password) async {
     try {
       UserCredential cred = await auth.createUserWithEmailAndPassword(
         email: email,
