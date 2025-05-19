@@ -1,6 +1,8 @@
 // models/user_model.dart
 class UserModel {
   final String uid;
+  final String fullName;
+  final String location;
   final String email;
   final Map<String, int> prayerCount;
   final List<String> diaryPageIds;
@@ -12,6 +14,8 @@ class UserModel {
     required this.prayerCount,
     required this.diaryPageIds,
     required this.mood,
+    required this.fullName,
+    required this.location,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -21,6 +25,8 @@ class UserModel {
       prayerCount: Map<String, int>.from(map['prayerCount'] ?? {}),
       diaryPageIds: List<String>.from(map['diaryPageIds'] ?? []),
       mood: map['mood'] ?? 'neutral',
+      fullName: map['fullName'] ?? '',
+      location: map['location'] ?? '',
     );
   }
 
@@ -31,6 +37,8 @@ class UserModel {
       'prayerCount': prayerCount,
       'diaryPageIds': diaryPageIds,
       'mood': mood,
+      'fullName': fullName,
+      'location': location,
     };
   }
 }

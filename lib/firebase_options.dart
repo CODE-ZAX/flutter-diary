@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBFZSyMI4_NsumBMQZFZPYLXPBelq8l8ao',
-    appId: '1:847466056968:android:0843d96d733018466c30bd',
+    appId: '1:847466056968:android:4f1f003d303a30f46c30bd',
     messagingSenderId: '847466056968',
     projectId: 'everyday-chronicles-208f1',
     storageBucket: 'everyday-chronicles-208f1.firebasestorage.app',
@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '847466056968',
     projectId: 'everyday-chronicles-208f1',
     storageBucket: 'everyday-chronicles-208f1.firebasestorage.app',
-    iosBundleId: 'com.example.everydayChronicles',
+    iosBundleId: 'com.example.everyday_chronicles',
   );
 }

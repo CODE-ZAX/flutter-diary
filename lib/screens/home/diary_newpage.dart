@@ -22,7 +22,7 @@ class DiaryEditorScreen extends StatefulWidget {
 class _DiaryEditorScreenState extends State<DiaryEditorScreen> {
   final _controller = quill.QuillController.basic();
   final titleController = TextEditingController();
-  final picker = ImagePicker();
+  // final picker = ImagePicker();
   final focusNode = FocusNode();
   final storage = FirebaseStorage.instance;
 
@@ -48,6 +48,7 @@ class _DiaryEditorScreenState extends State<DiaryEditorScreen> {
   }
 
   Future<void> _insertImage() async {
+    final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile == null) return;
 

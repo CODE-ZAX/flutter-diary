@@ -1,3 +1,8 @@
+buildscript {
+    dependencies {
+        classpath 'com.google.gms:google-services:4.3.15'
+    }
+}
 plugins {
     id "com.android.application"
     id "kotlin-android"
@@ -5,8 +10,9 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+
 android {
-    namespace = "com.cygnetic.everydaychronicles"
+    namespace = "com.example.everyday_chronicles"
     compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
@@ -16,12 +22,12 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = '1.8'
     }
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.cygnetic.everydaychronicles"
+        applicationId = "com.example.everyday_chronicles"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 23
@@ -47,8 +53,8 @@ dependencies {
   // Import the Firebase BoM
   implementation platform('com.google.firebase:firebase-bom:33.13.0')
 
-
   // TODO: Add the dependencies for Firebase products you want to use
   // When using the BoM, don't specify versions in Firebase dependencies
   // https://firebase.google.com/docs/android/setup#available-libraries
 }
+apply plugin: 'com.google.gms.google-services'

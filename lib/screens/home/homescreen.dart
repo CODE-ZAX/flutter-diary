@@ -1,15 +1,19 @@
 import 'package:everyday_chronicles/controllers/auth_controller.dart';
 import 'package:everyday_chronicles/controllers/diary_controller.dart';
+import 'package:everyday_chronicles/models/prayer_model.dart';
 import 'package:everyday_chronicles/screens/home/diary_newpage.dart';
+import 'package:everyday_chronicles/screens/home/mood_check.dart';
+import 'package:everyday_chronicles/screens/home/prayer_screen.dart';
+import 'package:everyday_chronicles/screens/home/setting_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class DairyHomeScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   @override
-  _DairyHomeScreenState createState() => _DairyHomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _DairyHomeScreenState extends State<DairyHomeScreen>
+class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -137,32 +141,5 @@ class DiaryHomeScreen extends StatelessWidget {
         )
       ],
     ));
-  }
-}
-
-class NamazPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Namaz Page: View Namaz times and daily check.'),
-    );
-  }
-}
-
-class MoodCheckerPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Mood Checker Page: Check your current mood.'),
-    );
-  }
-}
-
-class SettingsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Settings Page: Adjust your preferences.'),
-    );
   }
 }

@@ -4,7 +4,7 @@ import 'package:everyday_chronicles/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import '../screens/auth/sign_in_screen.dart';
-import '../screens/home/dairy_homescreen.dart';
+import '../screens/home/homescreen.dart';
 
 class AuthController extends GetxController {
   static AuthController instance = Get.find();
@@ -26,11 +26,11 @@ class AuthController extends GetxController {
       Get.offAll(() => SignInScreen());
     } else {
       await AuthController.instance.loadUser(user.uid);
-      Get.offAll(() => DairyHomeScreen());
+      Get.offAll(() => HomeScreen());
     }
   }
 
-  void signIn(String email, String password) async {
+  Future<void> signIn(String email, String password) async {
     try {
       UserCredential cred = await auth.signInWithEmailAndPassword(
         email: email,
@@ -52,7 +52,9 @@ class AuthController extends GetxController {
 
       UserModel newUser = UserModel(
         uid: cred.user!.uid,
+        fullName: email,
         email: email,
+        location: '',
         prayerCount: {
           'fajr': 0,
           'zuhr': 0,
