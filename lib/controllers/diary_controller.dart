@@ -1,4 +1,6 @@
 // controllers/diary_controller.dart
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import '../models/diary_model.dart';
@@ -29,13 +31,16 @@ class DiaryController extends GetxController {
   Future<void> addDiaryPage(DiaryModel page) async {
     final uid = AuthController.instance.auth.currentUser?.uid;
     if (uid == null) return;
-
-    await firestore
-        .collection('users')
-        .doc(uid)
-        .collection('diaryPages')
-        .doc(page.id)
-        .set(page.toMap());
+    try {
+      await firestore
+          .collection('users')
+          .doc(uid)
+          .collection('diaryPages')
+          .doc(page.id)
+          .set(page.toMap());
+    } catch (err) {
+      log("+++++++++++++++++++I AM HERE  2222+++++++++++++++${err.toString()}");
+    }
 
     userDiaryPages.insert(0, page); // Add to top
   }

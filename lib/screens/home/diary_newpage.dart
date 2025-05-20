@@ -25,6 +25,7 @@ class _DiaryEditorScreenState extends State<DiaryEditorScreen> {
   // final picker = ImagePicker();
   final focusNode = FocusNode();
   final storage = FirebaseStorage.instance;
+  final diaryController = Get.find<DiaryController>();
 
   @override
   void initState() {
@@ -82,9 +83,9 @@ class _DiaryEditorScreenState extends State<DiaryEditorScreen> {
     );
 
     if (widget.existingPage == null) {
-      DiaryController.instance.addDiaryPage(newPage);
+      diaryController.addDiaryPage(newPage);
     } else {
-      DiaryController.instance.updateDiaryPage(newPage);
+      diaryController.updateDiaryPage(newPage);
     }
 
     Get.back(); // Go back to diary list

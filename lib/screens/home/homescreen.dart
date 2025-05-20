@@ -31,18 +31,11 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final check = 0.obs;
+    Get.put(DiaryController());
     return Scaffold(
       appBar: AppBar(
         title: Text('Everyday Chronicles'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(icon: Icon(Icons.book), text: 'Diary'),
-            Tab(icon: Icon(Icons.access_time), text: 'Namaz'),
-            Tab(icon: Icon(Icons.mood), text: 'Mood Checker'),
-            Tab(icon: Icon(Icons.settings), text: 'Settings'),
-          ],
-        ),
       ),
       drawer: Drawer(
         child: ListView(
@@ -104,6 +97,31 @@ class _HomeScreenState extends State<HomeScreen>
           SettingsPage(),
         ],
       ),
+      floatingActionButton: Obx(() => check.value == 0
+          ? FloatingActionButton(
+              onPressed: () {
+                Get.to(() => DiaryEditorScreen());
+              },
+              child: Icon(Icons.add),
+            )
+          : Container()),
+      bottomNavigationBar: Material(
+        color: Theme.of(context).primaryColor,
+        child: TabBar(
+          controller: _tabController,
+          onTap: (value) {
+            check.value = value;
+          },
+          tabs: [
+            Tab(icon: Icon(Icons.book), text: 'Diary'),
+            Tab(icon: Icon(Icons.access_time), text: 'Namaz'),
+            Tab(icon: Icon(Icons.mood), text: 'Mood Checker'),
+            Tab(icon: Icon(Icons.settings), text: 'Settings'),
+          ],
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+        ),
+      ),
     );
   }
 }
@@ -135,10 +153,6 @@ class DiaryHomeScreen extends StatelessWidget {
             );
           }),
         ),
-        FloatingActionButton(
-          onPressed: () => Get.to(() => const DiaryEditorScreen()),
-          child: const Icon(Icons.add),
-        )
       ],
     ));
   }
