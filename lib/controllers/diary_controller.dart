@@ -7,6 +7,12 @@ import '../models/diary_model.dart';
 import 'auth_controller.dart';
 
 class DiaryController extends GetxController {
+  @override
+  void onInit() {
+    super.onInit();
+    fetchDiaryPages();
+  }
+
   static DiaryController instance = Get.put(DiaryController());
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;

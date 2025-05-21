@@ -133,7 +133,19 @@ class SignInScreen extends StatelessWidget {
                           child: TextButton(
                             onPressed: () {
                               // TODO: Navigate to forgot password screen
-                              Get.snackbar('Info', 'Forgot Password clicked');
+                              if (controller.email.value.isEmpty) {
+                                Get.snackbar(
+                                    'Error', 'Please enter your email');
+                                return;
+                              } else if (controller
+                                      .validateEmail(controller.email.value) !=
+                                  null) {
+                                Get.snackbar('Error', 'Enter a valid email');
+                                return;
+                              }
+
+                              controller.controller
+                                  .resetPassword(controller.email.value);
                             },
                             child: Text(
                               'Forgot Password?',

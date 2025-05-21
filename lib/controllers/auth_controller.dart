@@ -54,7 +54,7 @@ class AuthController extends GetxController {
         uid: cred.user!.uid,
         fullName: email,
         email: email,
-        location: '',
+        location: Location(0.0, 0.0, ''),
         prayerCount: {
           'fajr': 0,
           'zuhr': 0,

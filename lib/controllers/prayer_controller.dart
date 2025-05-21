@@ -16,12 +16,45 @@ class NamazController extends GetxController {
   void onInit() {
     super.onInit();
     fetchAndProcessPrayerTimes();
+    ever(AuthController.instance.currentUser, (user) {
+      if (user?.location != null) {
+        fetchAndProcessPrayerTimes();
+      }
+    });
+  }
+
+  PrayerTime? get currentPrayer {
+    final now = DateTime.now();
+
+    for (int i = 0; i < prayerTimes.length; i++) {
+      final start = prayerTimes[i].time;
+      final end = (i + 1 < prayerTimes.length)
+          ? prayerTimes[i + 1].time
+          : DateTime(now.year, now.month, now.day, 23, 59, 59); // till midnight
+
+      if (now.isAfter(start) && now.isBefore(end)) {
+        return prayerTimes[i];
+      }
+    }
+    return null;
+  }
+
+  PrayerTime? get nextPrayer {
+    final now = DateTime.now();
+    return prayerTimes.firstWhereOrNull((p) => p.time.isAfter(now));
   }
 
   Future<void> fetchAndProcessPrayerTimes() async {
+    final auth = AuthController.instance;
     try {
-      final times =
-          await PrayerApiService.fetchPrayerTimes(24.8607, 67.0011); // Karachi
+      final location = auth.currentUser.value?.location;
+      if (location == null) {
+        Get.snackbar("Error", "Location not set.");
+        return;
+      }
+
+      final times = await PrayerApiService.fetchPrayerTimes(
+          location.lat, location.lng); // Karachi
 
       final now = DateTime.now();
       final today = DateFormat('yyyy-MM-dd').format(now);
@@ -75,8 +108,13 @@ class NamazController extends GetxController {
     final uid = AuthController.instance.currentUser.value?.uid;
     if (uid == null) return;
 
-    final current = checkedPrayers[prayer] ?? false;
-    checkedPrayers[prayer] = !current;
+    final current = currentPrayer?.name;
+
+    // Only allow toggling the current active prayer
+    if (prayer != current) return;
+
+    final isChecked = checkedPrayers[prayer] ?? false;
+    checkedPrayers[prayer] = !isChecked;
 
     await firestore
         .collection('namaz_tracking')

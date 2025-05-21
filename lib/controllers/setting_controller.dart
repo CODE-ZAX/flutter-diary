@@ -1,3 +1,4 @@
+import 'package:everyday_chronicles/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,6 +22,7 @@ class SettingsController extends GetxController {
           .collection("users")
           .doc(uid)
           .update({'fullName': fullName});
+      await AuthController.instance.loadUser(uid);
       Get.snackbar("Success", "Full name updated.");
     } catch (e) {
       Get.snackbar("Error", e.toString());
@@ -45,19 +47,18 @@ class SettingsController extends GetxController {
     }
   }
 
-  Future<void> updateLocation(String location) async {
-    final uid = auth.currentUser?.uid;
+  Future<void> updateLocation(Location newLocation) async {
+    final uid = AuthController.instance.currentUser.value?.uid;
     if (uid == null) return;
 
-    try {
-      await firestore
-          .collection("users")
-          .doc(uid)
-          .update({'location': location});
-      Get.snackbar("Success", "Location updated.");
-    } catch (e) {
-      Get.snackbar("Error", e.toString());
-    }
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'location': newLocation.toJson(),
+    });
+
+    AuthController.instance.currentUser.update((val) {
+      if (val != null) val.location = newLocation;
+    });
+    AuthController.instance.loadUser(uid);
   }
 
   void openPrivacyPolicy() async {
