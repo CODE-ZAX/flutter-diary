@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:everyday_chronicles/controllers/diary_controller.dart';
 import 'package:everyday_chronicles/models/diary_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:get/get.dart';
@@ -44,7 +45,7 @@ class _DiaryEditorScreenState extends State<DiaryEditorScreen> {
     }
   }
 
-  void _saveDiaryPage() {
+  void _saveDiaryPage(BuildContext context) {
     final title = titleController.text.trim();
     if (title.isEmpty) {
       Get.snackbar("Validation Error", "Title cannot be empty");
@@ -71,7 +72,7 @@ class _DiaryEditorScreenState extends State<DiaryEditorScreen> {
       diaryController.updateDiaryPage(newPage);
     }
 
-    Get.back();
+    Navigator.of(context).pop(); // close editor screen
   }
 
   @override
@@ -82,8 +83,59 @@ class _DiaryEditorScreenState extends State<DiaryEditorScreen> {
             Text(widget.existingPage == null ? "New Diary Page" : "Edit Page"),
         actions: [
           IconButton(
+            icon: const Icon(Icons.summarize),
+            tooltip: 'Summarize Page',
+            onPressed: () async {
+              final text = _controller.document.toPlainText().trim();
+
+              if (text.split(RegExp(r'\s+')).length <= 20) {
+                Get.snackbar("Too Short",
+                    "Please write at least 20 words to summarize.");
+                return;
+              }
+
+              Get.dialog(
+                const Center(child: CircularProgressIndicator()),
+                barrierDismissible: false,
+              );
+
+              final summary = await diaryController.summarizeDiary(text);
+              Navigator.of(context).pop(); // close loading dialog
+
+              if (summary == null) {
+                Get.snackbar("Error", "Failed to summarize diary entry.");
+                return;
+              }
+
+              Get.dialog(
+                AlertDialog(
+                  title: const Text("Summary"),
+                  content: SelectableText(summary),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: summary));
+                        Get.snackbar("Copied", "Summary copied to clipboard.");
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("Copy"),
+                    ),
+                    TextButton(
+                      onPressed: () => () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("Close"),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.save),
-            onPressed: _saveDiaryPage,
+            onPressed: () {
+              _saveDiaryPage(context);
+            },
           )
         ],
       ),

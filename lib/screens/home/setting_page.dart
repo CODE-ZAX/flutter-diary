@@ -36,6 +36,13 @@ class SettingsPage extends StatelessWidget {
     selectedCity.value = user.location as Location?;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Settings"),
+        centerTitle: true,
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        elevation: 4,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -56,22 +63,22 @@ class SettingsPage extends StatelessWidget {
                 _buildCityDropdown(),
               ],
             ),
-            const SizedBox(height: 20),
-            _buildSectionCard(
-              title: "App Settings",
-              children: [
-                SwitchListTile(
-                  title: const Text("Dark Mode"),
-                  value: isDark,
-                  onChanged: (val) => settingsController
-                      .changeTheme(val ? ThemeMode.dark : ThemeMode.light),
-                  secondary: Icon(
-                    isDark ? Icons.nightlight_round : Icons.wb_sunny,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
+            // const SizedBox(height: 20),
+            // _buildSectionCard(
+            //   title: "App Settings",
+            //   children: [
+            //     SwitchListTile(
+            //       title: const Text("Dark Mode"),
+            //       value: isDark,
+            //       onChanged: (val) => settingsController
+            //           .changeTheme(val ? ThemeMode.dark : ThemeMode.light),
+            //       secondary: Icon(
+            //         isDark ? Icons.nightlight_round : Icons.wb_sunny,
+            //         color: theme.colorScheme.primary,
+            //       ),
+            //     ),
+            //   ],
+            // ),
             const SizedBox(height: 20),
             _buildSectionCard(
               title: "Legal",

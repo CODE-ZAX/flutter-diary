@@ -60,7 +60,7 @@ class MoodController extends GetxController {
         headers: {
           'Content-Type': 'application/json',
           'Authorization':
-              'Bearer JZktT0kjsAAujG8kctik3gaQMSpFiBdw', // Replace with your actual API key
+              'Bearer FqqFEmSXm7HMKAupUOXRvvpxIjlfdAot', // Replace with your actual API key
         },
         body: jsonEncode({
           "model": "mistral-medium",

@@ -1,8 +1,10 @@
 // controllers/diary_controller.dart
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import '../models/diary_model.dart';
 import 'auth_controller.dart';
 
@@ -65,6 +67,49 @@ class DiaryController extends GetxController {
     int index = userDiaryPages.indexWhere((p) => p.id == page.id);
     if (index != -1) {
       userDiaryPages[index] = page;
+    }
+  }
+
+  Future<String?> summarizeDiary(String content) async {
+    if (content.trim().split(RegExp(r'\s+')).length <= 20) {
+      return null; // not enough content
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://api.mistral.ai/v1/chat/completions'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Bearer FqqFEmSXm7HMKAupUOXRvvpxIjlfdAot', // secure this
+        },
+        body: jsonEncode({
+          "model": "mistral-medium",
+          "temperature": 0.3,
+          "messages": [
+            {
+              "role": "system",
+              "content":
+                  "Summarize the user's diary content into a single concise paragraph. Do not include mood judgment."
+            },
+            {
+              "role": "user",
+              "content": content,
+            },
+          ],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        return decoded["choices"][0]["message"]["content"]?.trim();
+      } else {
+        print("API Error: ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Mistral exception: $e");
+      return null;
     }
   }
 }

@@ -23,10 +23,10 @@ class AuthController extends GetxController {
 
   void _setInitialScreen(User? user) async {
     if (user == null) {
-      Get.offAll(() => SignInScreen());
+      Get.offAllNamed("/login");
     } else {
       await AuthController.instance.loadUser(user.uid);
-      Get.offAll(() => HomeScreen());
+      Get.offAllNamed("/dashboard");
     }
   }
 

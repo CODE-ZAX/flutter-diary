@@ -1,198 +1,230 @@
 import 'package:everyday_chronicles/controllers/auth_controller.dart';
-import 'package:everyday_chronicles/controllers/diary_controller.dart';
-import 'package:everyday_chronicles/screens/home/diary_newpage.dart';
-import 'package:everyday_chronicles/screens/home/mood_check.dart';
-import 'package:everyday_chronicles/screens/home/prayer_screen.dart';
-import 'package:everyday_chronicles/screens/home/setting_page.dart';
+import 'package:everyday_chronicles/controllers/exercises_controller.dart';
+import 'package:everyday_chronicles/controllers/prayer_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:everyday_chronicles/models/diary_model.dart';
-import 'package:intl/intl.dart';
-import 'dart:convert';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
+class DashboardScreen extends StatelessWidget {
+  final exercisesController = Get.put(ExercisesController());
+  final authController = Get.find<AuthController>();
+  final namazController = NamazController.instance;
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final check = 0.obs;
-
     final theme = Theme.of(context);
-    Get.put(DiaryController());
+
     return Scaffold(
       appBar: AppBar(
-        title: Obx(
-          () => Text([
-            'MY DIARY',
-            'NAMAZ TIMER',
-            'MOOD CHECKER',
-            'SETTINGS'
-          ][check.value]),
-        ),
-        backgroundColor: theme.colorScheme.primary,
+        title: const Text("Dashboard"),
+        backgroundColor: theme.primaryColor,
         foregroundColor: Colors.white,
-        elevation: 0,
         centerTitle: true,
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          DiaryHomeScreen(),
-          NamazPage(),
-          MoodCheckerPage(),
-          SettingsPage(),
-        ],
-      ),
-      floatingActionButton: Obx(() => check.value == 0
-          ? FloatingActionButton(
-              onPressed: () {
-                Get.to(() => DiaryEditorScreen());
-              },
-              child: Icon(Icons.add),
-            )
-          : Container()),
-      bottomNavigationBar: Material(
-        color: Theme.of(context).primaryColor,
-        child: TabBar(
-          controller: _tabController,
-          onTap: (value) {
-            check.value = value;
-          },
-          tabs: [
-            Tab(icon: Icon(Icons.book), text: 'Diary'),
-            Tab(icon: Icon(Icons.access_time), text: 'Namaz'),
-            Tab(icon: Icon(Icons.mood), text: 'Mood Checker'),
-            Tab(icon: Icon(Icons.settings), text: 'Settings'),
+      drawer: _buildDrawer(),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16),
+            _buildCarousel(),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Obx(() {
+                    final name =
+                        authController.currentUser.value?.fullName ?? "User";
+                    return Text(
+                      "Welcome, $name 👋",
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Here are some quick tips to get started:",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 12),
+                  _tipCard("✍️ Start writing in your diary to track your day."),
+                  _tipCard("🙏 Log your prayers and stay consistent."),
+                  _tipCard("🧘‍♂️ Try out a short workout from the carousel."),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Today's Prayers",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Obx(() {
+                    if (namazController.prayerTimes.isEmpty) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return Column(
+                      children: namazController.prayerTimes.map((prayer) {
+                        final isChecked =
+                            namazController.checkedPrayers[prayer.name] ??
+                                false;
+                        return _prayerStatusCard(prayer.name, isChecked);
+                      }).toList(),
+                    );
+                  }),
+                ],
+              ),
+            ),
           ],
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
         ),
       ),
     );
   }
-}
 
-// screens/diary/diary_home_screen.dart
-
-class DiaryHomeScreen extends StatelessWidget {
-  const DiaryHomeScreen({super.key});
-
-  String _getContentPreview(String contentJson) {
-    try {
-      final List<dynamic> deltaList = jsonDecode(contentJson);
-      return deltaList
-          .where((op) =>
-              op['insert'] != null && op['insert'].toString().trim().isNotEmpty)
-          .take(3)
-          .map((op) => op['insert'].toString().trim())
-          .join(" ")
-          .replaceAll('\n', ' ')
-          .trim();
-    } catch (e) {
-      return '';
-    }
-  }
-
-  String _formatDate(DateTime date) {
-    return DateFormat('MMM dd, yyyy – h:mm a').format(date);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final diaryController = DiaryController.instance;
-
-    return Scaffold(
-      // warm creamy background
-      body: Obx(() {
-        final pages = diaryController.userDiaryPages;
-
-        if (pages.isEmpty) {
-          return const Center(
-            child: Text(
-              "No diary pages yet.\nStart writing your first page!",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18, color: Colors.grey),
+  Widget _buildDrawer() {
+    return Drawer(
+      backgroundColor: Colors.white,
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          UserAccountsDrawerHeader(
+            accountName: Obx(() =>
+                Text(authController.currentUser.value?.fullName ?? 'User')),
+            accountEmail:
+                Obx(() => Text(authController.currentUser.value?.email ?? '')),
+            currentAccountPicture: const CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, size: 40, color: Colors.deepPurple),
             ),
-          );
-        }
+            decoration: const BoxDecoration(color: Colors.deepPurple),
+          ),
+          _drawerTile(Icons.book, 'Diary', () => Get.toNamed('/diary')),
+          _drawerTile(
+              Icons.access_time, 'Namaz Timer', () => Get.toNamed('/namaz')),
+          _drawerTile(
+              Icons.timer, 'Stopwatch', () => Get.toNamed('/stopwatch')),
+          _drawerTile(
+              Icons.extension, 'Exercises', () => Get.toNamed('/exercises')),
+          _drawerTile(Icons.cloud_sync_rounded, 'Weather & Steps',
+              () => Get.toNamed('/weathersteps')),
+          _drawerTile(Icons.mood, 'Mood Checker', () => Get.toNamed('/mood')),
+          _drawerTile(
+              Icons.settings, 'Settings', () => Get.toNamed('/settings')),
+          const Divider(),
+          _drawerTile(Icons.logout, 'Sign Out', () => authController.signOut()),
+        ],
+      ),
+    );
+  }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: pages.length,
+  Widget _drawerTile(IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.deepPurple),
+      title: Text(title),
+      onTap: onTap,
+    );
+  }
+
+  Widget _tipCard(String text) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.shade50,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(text, style: const TextStyle(fontSize: 15)),
+    );
+  }
+
+  Widget _prayerStatusCard(String name, bool isChecked) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: isChecked ? Colors.green.shade50 : Colors.red.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isChecked ? Colors.green : Colors.redAccent,
+          width: 1.2,
+        ),
+      ),
+      child: ListTile(
+        leading: Icon(
+          isChecked ? Icons.check : Icons.close,
+          color: isChecked ? Colors.green : Colors.red,
+        ),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
+        trailing: Text(
+          isChecked ? "Offered" : "Pending",
+          style: TextStyle(
+            color: isChecked ? Colors.green : Colors.redAccent,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCarousel() {
+    return Obx(() {
+      final videos = exercisesController.videoUrls;
+
+      return Container(
+        height: 160,
+        padding: const EdgeInsets.only(left: 16),
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: videos.length,
           itemBuilder: (context, index) {
-            final DiaryModel page = pages[index];
-            final preview = _getContentPreview(page.content);
+            final url = videos[index];
+            final videoId = YoutubePlayer.convertUrlToId(url);
+            final thumbnailUrl = 'https://img.youtube.com/vi/$videoId/0.jpg';
 
-            return GestureDetector(
-              onTap: () => Get.to(() => DiaryEditorScreen(existingPage: page)),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.deepPurple.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+            return Container(
+              margin: const EdgeInsets.only(right: 12),
+              width: 250,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                image: DecorationImage(
+                  image: NetworkImage(thumbnailUrl),
+                  fit: BoxFit.cover,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      page.title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      preview.isNotEmpty ? preview : "No content yet...",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      "Edited on ${_formatDate(page.lastEdited)}",
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey,
-                      ),
-                    )
-                  ],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.deepPurple.withOpacity(0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Container(
+                alignment: Alignment.bottomLeft,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+                  ),
+                ),
+                child: const Text(
+                  'Exercise',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             );
           },
-        );
-      }),
-    );
+        ),
+      );
+    });
   }
 }

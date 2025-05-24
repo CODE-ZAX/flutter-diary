@@ -6,6 +6,7 @@ import '../models/prayer_model.dart';
 import 'auth_controller.dart';
 
 class NamazController extends GetxController {
+  static NamazController instance = Get.find();
   var prayerTimes = <PrayerTime>[].obs;
   var checkedPrayers = <String, bool>{}.obs;
   var minutesLeft = <String, int>{}.obs;

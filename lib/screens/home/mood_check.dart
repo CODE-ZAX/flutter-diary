@@ -9,6 +9,13 @@ class MoodCheckerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Mood Checker"),
+        centerTitle: true,
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        elevation: 4,
+      ),
       backgroundColor: Colors.deepPurple.shade50,
       body: Center(
         child: Obx(() {

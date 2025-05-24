@@ -104,6 +104,13 @@ class _NamazPageState extends State<NamazPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.deepPurple.shade50,
+      appBar: AppBar(
+        title: const Text("Namaz Tracker"),
+        centerTitle: true,
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        elevation: 4,
+      ),
       body: Obx(() {
         final total = controller.prayerTimes.length;
         final checked = controller.checkedPrayers.values.where((v) => v).length;

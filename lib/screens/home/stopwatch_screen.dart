@@ -1,21 +1,20 @@
+import 'package:everyday_chronicles/controllers/stopwatch_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import 'stopwatch_controller.dart';
 
 class StopwatchPage extends StatelessWidget {
   final StopwatchController controller = Get.put(StopwatchController());
-
-  Color get primary => Colors.deepPurple;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.deepPurple.shade50,
       appBar: AppBar(
-        title: const Text('⏱️ Stopwatch'),
-        backgroundColor: primary,
+        title: const Text("Stopwatch"),
         centerTitle: true,
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
         elevation: 4,
       ),
       body: Padding(
@@ -23,90 +22,110 @@ class StopwatchPage extends StatelessWidget {
         child: Column(
           children: [
             Obx(() => AnimatedContainer(
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeOut,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: primary.withOpacity(0.2),
-                    blurRadius: 15,
-                    offset: const Offset(0, 6),
-                  )
-                ],
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-              child: Column(
-                children: [
-                  Text(
-                    controller.formatTime(controller.elapsed.value),
-                    style: TextStyle(
-                      fontSize: 52,
-                      fontWeight: FontWeight.bold,
-                      color: primary.shade800,
-                      letterSpacing: 1.5,
-                    ),
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeOut,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.deepPurple.withOpacity(0.2),
+                        blurRadius: 15,
+                        offset: const Offset(0, 6),
+                      )
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Lottie.asset(
-                    controller.isRunning.value
-                        ? 'assets/animation_running.json'
-                        : 'assets/animation_idle.json',
-                    height: 80,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                  child: Column(
+                    children: [
+                      Text(
+                        controller.formatTime(controller.elapsed.value),
+                        style: TextStyle(
+                          fontSize: 52,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple.shade800,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Lottie.asset(
+                        controller.isRunning.value
+                            ? 'assets/animations/running.json'
+                            : 'assets/animations/idle.json',
+                        height: 80,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )),
+                )),
             const SizedBox(height: 30),
             Obx(() => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildControlButton(
-                  onTap: controller.isRunning.value ? controller.stop : controller.start,
-                  text: controller.isRunning.value ? 'Stop' : 'Start',
-                  color: controller.isRunning.value ? Colors.red : primary,
-                ),
-                _buildControlButton(
-                  onTap: controller.reset,
-                  text: 'Reset',
-                  color: Colors.grey.shade600,
-                ),
-                _buildControlButton(
-                  onTap: controller.isRunning.value ? controller.recordLap : null,
-                  text: 'Lap',
-                  color: Colors.teal,
-                ),
-              ],
-            )),
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildControlButton(
+                      onTap: controller.isRunning.value
+                          ? controller.stop
+                          : controller.start,
+                      text: controller.isRunning.value ? 'Stop' : 'Start',
+                      color: controller.isRunning.value
+                          ? Colors.red
+                          : Colors.deepPurple,
+                    ),
+                    _buildControlButton(
+                      onTap: controller.reset,
+                      text: 'Reset',
+                      color: Colors.grey.shade600,
+                    ),
+                    _buildControlButton(
+                      onTap: controller.isRunning.value
+                          ? controller.recordLap
+                          : null,
+                      text: 'Lap',
+                      color: Colors.teal,
+                    ),
+                  ],
+                )),
             const SizedBox(height: 30),
             Row(
               children: [
-                Icon(Icons.flag, color: primary.shade400),
+                Icon(Icons.flag, color: Colors.deepPurple.shade400),
                 const SizedBox(width: 10),
-                Text('Laps', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: primary.shade700)),
+                Text('Laps',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.deepPurple.shade700)),
               ],
             ),
             const SizedBox(height: 10),
             Obx(() => Expanded(
-              child: controller.laps.isEmpty
-                  ? Center(child: Text('No laps yet.', style: TextStyle(color: primary.shade300)))
-                  : ListView.separated(
-                      itemCount: controller.laps.length,
-                      separatorBuilder: (_, __) => Divider(color: primary.shade100),
-                      itemBuilder: (context, index) {
-                        final lapTime = controller.formatTime(controller.laps[index]);
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: primary.withOpacity(0.2),
-                            child: Text('${index + 1}', style: TextStyle(color: primary)),
-                          ),
-                          title: Text('Lap ${index + 1}'),
-                          trailing: Text(lapTime, style: TextStyle(fontWeight: FontWeight.bold)),
-                        );
-                      },
-                    ),
-            )),
+                  child: controller.laps.isEmpty
+                      ? Center(
+                          child: Text('No laps yet.',
+                              style:
+                                  TextStyle(color: Colors.deepPurple.shade300)))
+                      : ListView.separated(
+                          itemCount: controller.laps.length,
+                          separatorBuilder: (_, __) =>
+                              Divider(color: Colors.deepPurple.shade100),
+                          itemBuilder: (context, index) {
+                            final lapTime =
+                                controller.formatTime(controller.laps[index]);
+                            return ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor:
+                                    Colors.deepPurple.withOpacity(0.2),
+                                child: Text('${index + 1}',
+                                    style: TextStyle(color: Colors.deepPurple)),
+                              ),
+                              title: Text('Lap ${index + 1}'),
+                              trailing: Text(lapTime,
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                            );
+                          },
+                        ),
+                )),
           ],
         ),
       ),
