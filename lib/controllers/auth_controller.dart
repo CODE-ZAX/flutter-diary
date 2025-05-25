@@ -1,5 +1,8 @@
 // controllers/auth_controller.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:everyday_chronicles/controllers/diary_controller.dart';
+import 'package:everyday_chronicles/controllers/prayer_controller.dart';
+import 'package:everyday_chronicles/controllers/setting_controller.dart';
 import 'package:everyday_chronicles/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
@@ -26,6 +29,7 @@ class AuthController extends GetxController {
       Get.offAllNamed("/login");
     } else {
       await AuthController.instance.loadUser(user.uid);
+
       Get.offAllNamed("/dashboard");
     }
   }

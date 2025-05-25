@@ -104,23 +104,7 @@ class SettingsPage extends StatelessWidget {
                   text: "Delete All Diary Pages",
                   color: Colors.redAccent,
                   onTap: () async {
-                    await Get.defaultDialog<bool>(
-                          title: 'Confirm Delete',
-                          middleText:
-                              'Are you sure you want to delete all diary pages? This action cannot be undone.',
-                          textConfirm: 'Delete',
-                          textCancel: 'Cancel',
-                          confirmTextColor: Colors.white,
-                          onConfirm: () => {
-                            settingsController
-                                .deleteAllDiaryPages()
-                                .then((val) {
-                              Navigator.of(context).pop();
-                            })
-                          },
-                          onCancel: () => Navigator.of(context).pop(),
-                        ) ??
-                        false;
+                    await settingsController.deleteAllDiaryPages();
                   },
                 ),
               ],

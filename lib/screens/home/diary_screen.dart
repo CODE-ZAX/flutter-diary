@@ -7,9 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class DiaryHomeScreen extends StatelessWidget {
+class DiaryHomeScreen extends StatefulWidget {
   const DiaryHomeScreen({super.key});
 
+  @override
+  State<DiaryHomeScreen> createState() => _DiaryHomeScreenState();
+}
+
+class _DiaryHomeScreenState extends State<DiaryHomeScreen> {
   String _getContentPreview(String contentJson) {
     try {
       final List<dynamic> deltaList = jsonDecode(contentJson);
@@ -28,6 +33,14 @@ class DiaryHomeScreen extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     return DateFormat('MMM dd, yyyy – h:mm a').format(date);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch diary pages when the screen is initialized
+    DiaryController.instance.userDiaryPages.clear();
+    DiaryController.instance.fetchDiaryPages();
   }
 
   @override

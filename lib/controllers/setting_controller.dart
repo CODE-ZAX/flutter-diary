@@ -41,7 +41,10 @@ class SettingsController extends GetxController {
         await doc.reference.delete();
       }
       DiaryController.instance.userDiaryPages.clear();
-      Get.snackbar("Deleted", "All diary pages removed.");
+      Get.snackbar(
+        "Deleted",
+        "All diary pages removed.",
+      );
     } catch (e) {
       Get.snackbar("Error", e.toString());
     }
@@ -84,6 +87,7 @@ class SettingsController extends GetxController {
   }
 
   void logout() {
+    Get.find<DiaryController>().userDiaryPages.clear();
     AuthController.instance.signOut();
   }
 }

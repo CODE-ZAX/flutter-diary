@@ -47,10 +47,13 @@ class NamazController extends GetxController {
 
   Future<void> fetchAndProcessPrayerTimes() async {
     final auth = AuthController.instance;
+    final user = auth.currentUser.value;
+    if (user == null) {
+      return;
+    }
     try {
       final location = auth.currentUser.value?.location;
       if (location == null) {
-        Get.snackbar("Error", "Location not set.");
         return;
       }
 

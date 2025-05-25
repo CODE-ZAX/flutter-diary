@@ -23,9 +23,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(AuthController());
-    Get.put(DiaryController());
-    Get.put(NamazController());
-    Get.put(SettingsController());
 
     return GetMaterialApp(
         debugShowCheckedModeBanner: false,

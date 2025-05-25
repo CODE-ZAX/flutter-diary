@@ -1,6 +1,8 @@
 import 'package:everyday_chronicles/controllers/auth_controller.dart';
+import 'package:everyday_chronicles/controllers/diary_controller.dart';
 import 'package:everyday_chronicles/controllers/exercises_controller.dart';
 import 'package:everyday_chronicles/controllers/prayer_controller.dart';
+import 'package:everyday_chronicles/controllers/setting_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -8,12 +10,13 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 class DashboardScreen extends StatelessWidget {
   final exercisesController = Get.put(ExercisesController());
   final authController = Get.find<AuthController>();
-  final namazController = NamazController.instance;
-
+  final namazController = Get.put(NamazController());
+  final settingController = Get.put(SettingsController());
   DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Get.put(DiaryController()).fetchDiaryPages();
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -118,7 +121,10 @@ class DashboardScreen extends StatelessWidget {
           _drawerTile(
               Icons.settings, 'Settings', () => Get.toNamed('/settings')),
           const Divider(),
-          _drawerTile(Icons.logout, 'Sign Out', () => authController.signOut()),
+          _drawerTile(Icons.logout, 'Sign Out', () {
+            Get.find<DiaryController>().userDiaryPages.clear();
+            authController.signOut();
+          }),
         ],
       ),
     );
